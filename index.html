@@ -11,14 +11,31 @@
 </head>
 
 <body>
-<section data-role="pageOne">
+<section data-role="page" id="rounds">
     <header data-role="header">
         <h1>Header</h1>
     </header>
     <article data-role="content">
-        göbblie bögglie
+        <ul data-role="listview" id="r_lw">
+            <li>
+                <a href="#r_f" data-rel="popup" data-role="button">New Round</a>
+            </li>
+        </ul>
     </article>
+    <section data-role="popup" id="r_f">
+        <header data-role="header">
+            <h2>New Round</h2>
+        </header>
+            <select name="select-choice-1" id="r_f_s">
+                <option value="red">Red</option>
+                <option value="yellow">Yellow</option>
+            </select>
+            <ul data-role="listview" id="rounds_form_lw1" style="width: 50%; display: inline">
+                <li><button id="r_f_lw1_b">New Player</button></li>
+            </ul>
+            <ul data-role="listview" id="rounds_form_lw2" style="width: 50%; display: inline">
+            </ul>
+    </section>
 </section>
-
 </body>
 </html>

@@ -1,48 +1,88 @@
-var Dg_app = {};
-
-Dg_app.data = (function(){
+/*global, $*/
+DGAPP.gui = (function(){
     "use strict";
-    var mIndex, 
-        mPBest,
-        mCurr;
+    var roundsForm = (function() {
 
-    // @return {string} parsed current date i.e: 27/5-2039
-    var getParsedDate = function(){
-        var tDate = new Date(),
-            tYear = tDate.getFullYear(),
-            tMonth = tDate.getMonth(),
-            tDay = tDate.getDate();
+    }());
 
-        return  tDay + "/" + tMonth + "-" + tYear;
-    };
+}());
+
+
+var DGAPP = (function(){
+    "use strict";
+    var mData, 
+        mSave = "save",
+
+        // @return {string} parsed current date i.e: "27/05/2039 14:38"
+        getParsedDate = function(){
+            var tDate = new Date(),
+                tParse = function (arg_number) {
+                    return (arg_number < 10)? '0' + arg_number: arg_number;
+                };
+
+            return  tParse(tDate.getDate()) + "/" + 
+                    tParse(tDate.getMonth()) + "/" + 
+                    tParse(tDate.getFullYear()) + " " + 
+                    tParse(tDate.getHours()) + ":" +
+                    tParse(tDate.getMinutes());
+        },
     
-    // @param {string} property of mIndex to be saved
-    var save = function(arg_string){
-        localStorage.setItem(arg_string, JSON.stringify(mIndex[arg_string]));
-    };
+        // @param {string} property of mIndex to be saved
+        save = function(){
+            localStorage.setItem(mSave, JSON.stringify(mData));
+            return this;
+        },
 
-    // @param {string} key of value to load.
-    // @return {object} parsed object
-    var load = function(arg_string){
-        return JSON.parse(localStorage.getItem(arg_string)) || {};
-    };
+        // @param {string} key of value to load.
+        // @return {object} parsed object
+        load = function(){
+            mData =  JSON.parse(localStorage.getItem(mSave)) || {};
+            return this;
+        },
+
+        newRound = function(arg_string){
+
+            var tDate = getParsedDate();
+
+            if(!mData.hasOwnProperty(tDate) && arg_string){
+                mData[tDate] = {};
+                mData[tDate].id = tDate;
+                mData[tDate].default = arg_string;
+                mData[tDate][arg_string] = [];
+            }
+            return this;
+        };
+
 
     //public methods
     return {
-        init: function(){
-            mIndex = load("save");
-            mIndex.pb = load("pb");
-            return this;
+        load: load,
+        getData: function(){
+            return mData;
         },
-        close: function(){
-            save("save");
-            save({name: "pb", table: mIndex.pb});
-            return this;
-        },
-        pick: function(arg_string){
-            mCurr = load(arg_string);
-            return this;
-        },
-
+        define: newRound,
+        save: save
     };
 }());
+
+DGAPP.PAR = {
+    yellow: [
+        3, 3, 3, 3, 3, 3,
+        3, 3, 3, 3, 3, 3,
+        3, 3, 3, 3, 3, 3
+    ],
+    red: [
+        3, 3, 3, 3, 3, 3,
+        3, 3, 4, 3, 3, 4,
+        3, 4, 3, 4, 3, 3
+    ]
+};
+
+
+$(document).on('pagebeforeshow', '#rounds', function(){
+    "use strict";
+    $.each( DGAPP.data.getData(), function(key, value) {
+        $('<li>').append(value.id).appendTo('#roundsListView');
+    });
+    $('#roundsListView').listview("refresh");
+});
